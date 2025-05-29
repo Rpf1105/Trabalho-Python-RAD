@@ -1,9 +1,12 @@
 import tkinter as tk
 from cProfile import label
-from tkinter import font, StringVar
+from tkinter import font, StringVar, Label
 from tkinter import ttk
 
-from db import connectDbAluno, queryExec
+from cryptography.fernet import Fernet
+
+import db
+from db import connectDb, queryExec, Disciplina, Inscricao, returnSelect
 
 
 class myApp(tk.Tk):
@@ -11,7 +14,9 @@ class myApp(tk.Tk):
         tk.Tk.__init__(self)
         self.title("Banco da escola")
         header = tk.Frame(self)
-        title = tk.Label(header, text="Banco de dados magico",fg="snow",font=tk.font.Font(family="Eras Bold ITC", size=40,))
+        #essencialmente cookies para manter login, na raiz
+        self.matriculacookie = tk.StringVar()
+        title = tk.Label(self, text="Banco de dados",fg="snow",font=tk.font.Font(family="Eras Bold ITC", size=40,))
         title.configure(background="#5864a7")
         header.pack(side="top", expand=True)
         title.pack()
@@ -22,7 +27,7 @@ class myApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
         self.frames = {}
         #importa classes que definem as paginas em frames e sobrepõe eles
-        for f in (mainMenu, mainAluno, pageDisciplinas, pageInscricao, getMatricula):
+        for f in (mainMenu, mainAluno, pageDisciplinas, pageInscricao, getMatricula, getLogin):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -31,6 +36,9 @@ class myApp(tk.Tk):
     #funcao para trazer um frame pra cima para deixar ele visivel
     def showpage(self, pagename):
         frame = self.frames[pagename]
+        if pagename == "mainMenu":
+            #apaga dados dos cookies ao voltar ao menu
+            self.matriculacookie.set("")
         frame.tkraise()
 
 class mainMenu(tk.Frame):
@@ -42,9 +50,11 @@ class mainMenu(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
         button1 = tk.Button(self, text="Alunos", command=lambda: control.showpage("getMatricula"),font=font)
         button1.pack(pady=10)
-        button2 = tk.Button(self, text="Professor", command=lambda: control.showpage("pageDisciplinas"),font=font)
+        button2 = tk.Button(self, text="Professor", command=lambda: control.showpage("getLogin"),font=font)
         button2.pack(pady=10)
 
+
+#aluno
 class getMatricula(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
@@ -60,27 +70,35 @@ class getMatricula(tk.Frame):
         mensagem = tk.Label(self, textvariable=self.msgvar)
         mensagem.pack()
     def checkMatricula(self):
-        con = connectDbAluno()
+        con = connectDb()
         cursor = con.cursor()
         mat = self.matricula.get()
-        cursor.execute('''SELECT * FROM public."Aluno" WHERE "Matricula" = %s;''', (mat,))
+        cursor.execute('''SELECT * FROM public.Aluno WHERE Matricula = %s;''', (mat,))
         rows = cursor.fetchone()
         if rows is None:
             self.msgvar.set("Essa matricula não existe")
         else:
+            #variavel da janela pai para salvar a matricula do aluno
+            self.control.matriculacookie.set(mat)
             self.msgvar.set("")
             self.control.showpage("mainAluno")
 
-#aluno
+
 class mainAluno(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
-        self.controller = control
+        self.control = control
         label =tk.Label(self, text="Bem vindo ao registro de notas\nQual desses você é?")
         label.pack(side="top", fill="x", pady=10)
-        novainscricao = tk.Button(self, text="Fazer inscrição",
-                           command=lambda: self.showpage("inscricaoAluno"))
-        novainscricao.pack()
+        #operações
+        options = tk.Frame(self)
+        novainscricao = tk.Button(options, text="Fazer inscrição",
+                           command=lambda: self.showpage("inscricaoAluno"),padx=5)
+        novainscricao.pack(side="left")
+        vernotas = tk.Button(options, text="Ver suas notas",
+                           command=lambda: self.showpage("notaAluno"), padx=5)
+        vernotas.pack(side="left")
+        options.pack()
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -89,7 +107,7 @@ class mainAluno(tk.Frame):
                            command=lambda: control.showpage("mainMenu"))
         button.pack(side="top")
         self.frames={}
-        for f in (inscricaoAluno,):
+        for f in (inscricaoAluno,notaAluno):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -101,20 +119,135 @@ class mainAluno(tk.Frame):
 class inscricaoAluno(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
-        self.controller = control
-        form = tk.Frame()
-        matlabel = tk.Label(self, text="Digite o código do curso")
-        codigo=tk.Entry(self)
-        submit = tk.Button(self, text="Enviar")
+        self.control = control
+        form = tk.Frame(self)
+        matlabel = tk.Label(form, text="Digite o código do curso")
+        self.codigo = tk.StringVar(self)
+        codigo=tk.Entry(form, textvariable=self.codigo)
+        submit = tk.Button(self, text="Enviar", command=self.checkDisciplina)
+        form.pack(pady=10)
         matlabel.grid(row=0, column=0)
         codigo.grid(row=0, column=1)
-        submit.grid(row=1, column=0)
+        #tabela para mostrar disciplinas existentes
+        titles = ["Nome", "Código", "Ano", "Semestre"]
+        tablecont = tk.Frame(self, padx=20, pady=20)
+        Table(tablecont, titles, Disciplina.selectAll(connectDb()))
+        submit.pack()
+        self.msgvar = tk.StringVar(value="")
+        mensagem = tk.Label(self, textvariable=self.msgvar)
+        mensagem.pack()
+        tablecont.pack()
+    def checkDisciplina(self):
+        con = connectDb()
+        cursor = con.cursor()
+        cod = self.codigo.get()
+        cursor.execute('''SELECT * FROM public.Disciplina WHERE Código = %s;''', (cod,))
+        rows = cursor.fetchone()
+        if rows is None:
+            self.msgvar.set("Essa disciplina não existe")
+        else:
+            #as camadas estão indo fundo demais, pra chegar no cookie da raiz precisa disso
+            self.msgvar.set("")
+            newinscricao = Inscricao(self.control.control.matriculacookie.get(), cod)
+            newinscricao.insert(connectDb())
 
-#disciplinas
+class notaAluno(tk.Frame):
+    def __init__(self, parent, control):
+        tk.Frame.__init__(self, parent)
+        self.control = control
+        self.tablecont = tk.Frame(self)
+        label = tk.Label(self, text="Suas notas")
+        label.pack()
+        search = tk.Frame(self)
+        self.cod = tk.StringVar()
+        entrylabel = tk.Label(search, text="Digite o código da matéria registrada")
+        searchbar = tk.Entry(search, textvariable=self.cod)
+        submit = tk.Button(search, text="Pesquisar", command=self.searchTable)
+        reset = tk.Button(search, text="Redefinir", command=self.fullTable)
+        entrylabel.pack(side="left")
+        searchbar.pack(side="left")
+        submit.pack(side="left")
+        reset.pack(side="left")
+        search.pack()
+        self.msgvar = tk.StringVar()
+        msgerro = tk.Label(self, textvariable=self.msgvar)
+        msgerro.pack()
+        self.tablecont.pack()
+
+    def fullTable(self):
+        for child in self.tablecont.winfo_children():
+            child.destroy()
+        self.msgvar.set("")
+        titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
+        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), "")
+        lst = tempobj.selectAllAluno(connectDb())
+        Table(self.tablecont, titles, lst)
+
+    def searchTable(self):
+        if self.cod.get() == "":
+            self.msgvar.set("Não foi digitado nenhum valor")
+            return 
+        else:
+            self.msgvar.set("")
+        for child in self.tablecont.winfo_children():
+            child.destroy()
+        titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
+        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
+        lst = tempobj.select(connectDb())
+        if not lst:
+            self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
+            return
+        Table(self.tablecont, titles, lst)
+
+
+#professor
+class getLogin(tk.Frame):
+    def __init__(self, parent, control):
+        tk.Frame.__init__(self, parent)
+        self.control = control
+        tk.Label(self, text="Digite as suas credenciais").pack()
+        form = tk.Frame(self)
+        self.email = tk.StringVar(self)
+        tk.Label(form, text="Usuario").grid(row=0, column=0)
+        tk.Entry(form, textvariable=self.email).grid(row=0, column=1)
+        self.password = tk.StringVar(self)
+        tk.Label(form, text="Senha").grid(row=1, column=0)
+        tk.Entry(form, textvariable=self.password).grid(row=1, column=1)
+        submit = tk.Button(self, text="Enviar", command=self.checkLogin)
+        form.pack()
+        submit.pack()
+        voltar = tk.Button(self, text="voltar", command=lambda: control.showpage("mainMenu"))
+        voltar.pack()
+        self.msgvar = tk.StringVar(value="")
+        mensagem = tk.Label(self, textvariable=self.msgvar)
+        mensagem.pack()
+    def checkLogin(self):
+        con = connectDb()
+        cursor = con.cursor()
+        user = self.email.get()
+        password = self.password.get()
+        query = '''SELECT chave FROM public.funcionários WHERE email = %s'''
+        chaveget = returnSelect(connectDb(), query, (user,))
+        print(chaveget)
+        chave = Fernet(chaveget)
+        passwordenc = chave.encrypt(password.encode())
+        print(passwordenc)
+        cursor.execute('''SELECT 1 FROM public.funcionários WHERE senha = %s;''', ("passwordenc",))
+        rows = cursor.fetchone()
+        if rows is None:
+            self.msgvar.set("O usuario e/ou senha estão incorretos")
+        else:
+            #variavel da janela pai para salvar a matricula do aluno
+            self.control.logincookie.set(True)
+            self.msgvar.set("")
+            self.control.showpage("mainAluno")
+
+
+
 class pageDisciplinas(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
-        self.controller = control
+        self.control = control
         label = tk.Label(self, text="disciplinas")
         label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Voltar",
@@ -124,13 +257,34 @@ class pageDisciplinas(tk.Frame):
 class pageInscricao(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
-        self.controller = control
+        self.control = control
         label = tk.Label(self, text="inscricao")
         label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Voltar",
                            command=lambda: control.showpage("mainMenu"))
         button.pack()
+# gerador de tabelas
+class Table:
+    def __init__(self, parent, titles, list):
+        try:
+            rows = len(list)
+            columns = len(list[0])
+        except IndexError:
+            return
+        for n in range(len(titles)):
+            self.e = tk.Entry(parent, width=20,
+                           font=('Arial', 12, 'bold'))
+            self.e.grid(row=0, column=n)
+            self.e.insert(tk.END, titles[n])
+            self.e.configure(state="disabled")
+        for i in range(rows):
+            for j in range(columns):
+                self.e = tk.Entry(parent, width=20,
+                               font=('Arial', 12))
 
+                self.e.grid(row=i+1, column=j)
+                self.e.insert(tk.END, list[i][j])
+                self.e.configure(state="disabled")
 def init():
     app = myApp()
     app.mainloop()
