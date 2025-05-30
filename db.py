@@ -91,11 +91,10 @@ class Funcionario:
     def __init__(self, nome, email, senha, cargo):
         self.nome = nome
         self.email = email
-        self.chave = Fernet.generate_key().decode()
-        self.senha = Fernet(self.chave).encrypt(senha.encode())
+        self.senha = senha
         self.cargo = cargo
     def insert(self, con):
-        query = '''INSERT INTO public.funcionários VALUES(%(email)s, %(nome)s, %(senha)s, %(chave)s, %(cargo)s)'''
+        query = '''INSERT INTO public.funcionários VALUES(%(email)s, %(nome)s, %(senha)s, %(cargo)s)'''
         queryExec(con, query, self)
     def update(self, con):
         query = '''UPDATE public.funcionários SET senha = %(senha)s WHERE email = %(email)s'''

@@ -9,14 +9,11 @@ def main():
     dis1.insert(connectDb())
     Aluno("Rogerio").insert(connectDb())
 
-    func1 = Funcionario("Rogerio", "rpf1105", "12345678", "Admin")
+    func1 = Funcionario("Rogerio", "rpf1105@gmail.com", "12345678", "Admin")
     func1.insert(connectDb())
-    print(func1.chave)
-    senhaenc = func1.senha
-    key = Fernet(func1.chave)
-    senha = key.decrypt(senhaenc).decode()
+    print(func1.senha)
+    senha = func1.senha
     print(senha)
-    print(senhaenc)
 
 
     #print(dis1.select(con))
