@@ -12,7 +12,7 @@ def main():
     dis1 = Disciplina("DESENVOLVIMENTO RÁPIDO DE APLICAÇÕES EM PYTHON","ARA0095", 2025, 3)
     dis2 = Disciplina("ÁLGEBRA LINEAR", "ARA2566", 2025, 3)
     dis1.insert()
-    Aluno("Rogerio").insert()
+    #Aluno("").insert()
 
     func1 = Funcionario("Rogerio", "rpf1105@gmail.com", "12345678")
     func1.insert()

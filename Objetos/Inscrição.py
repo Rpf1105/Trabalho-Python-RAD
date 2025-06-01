@@ -22,9 +22,12 @@ class Inscricao:
     def select(self):
         query = '''SELECT * FROM public.Inscrição WHERE Disciplina = %(disciplina)s AND Aluno = %(aluno)s'''
         return returnSelect(connectDb(), query, self)
+    def selectNotas(self):
+        query = '''SELECT sim1, sim2, av, avs FROM public.Inscrição WHERE Disciplina = %(disciplina)s AND Aluno = %(aluno)s'''
+        return returnSelect(connectDb(), query, self)
     def selectAllAluno(self):
         query = '''SELECT * FROM public.Inscrição WHERE Aluno = %(aluno)s'''
         return returnSelect(connectDb(), query, self)
     def selectAllDisciplina(self):
-        query = '''SELECT * FROM public.Inscrição WHERE "Disciplina" = %(disciplina)s'''
+        query = '''SELECT aluno FROM public.Inscrição WHERE Disciplina = %(disciplina)s'''
         return returnSelect(connectDb(), query, self)

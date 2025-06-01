@@ -1,4 +1,6 @@
 import tkinter as tk
+from xml.etree.ElementPath import prepare_self
+
 from Objetos import *
 from cProfile import label
 from tkinter import font, StringVar, Label
@@ -331,17 +333,44 @@ class notaProf(tk.Frame):
         self.tablecont = tk.Frame(self)
         label = tk.Label(self, text="Inserir notas dos alunos")
         label.pack()
-        form = tk.Frame(self)
+        self.form = tk.Frame(self)
         self.mat = tk.StringVar()
         self.cod = tk.StringVar()
         self.sim1 = tk.StringVar()
         self.sim2 = tk.StringVar()
         self.av = tk.StringVar()
         self.avs = tk.StringVar()
+        search = tk.Frame(self)
+        codlabel = tk.Label(search, text="Digite o código da matéria registrada")
+        codentry = tk.Entry(search, textvariable=self.cod)
+        submit = tk.Button(search, text="Pesquisar", command=self.pesquisarTurma)
+        codlabel.grid(row=0, column=0)
+        codentry.grid(row=0, column=1)
+        submit.grid(row=0, column=2)
+        search.pack()
+        self.form.pack()
+        self.msgvar = tk.StringVar()
+        msgerro = tk.Label(self, textvariable=self.msgvar)
+        msgerro.pack()
+        self.tablecont.pack()
+    def pesquisarTurma(self):
+        for child in self.form.winfo_children():
+            child.destroy()
+        if not self.cod.get():
+            return 0
+        form = self.form
+        query = '''Select aluno from public.inscrição WHERE código = %(disciplina)s'''
+        tempobj = Inscricao("", self.cod.get())
+        rows = tempobj.selectAllDisciplina()
+        lst = []
+        if not rows:
+            return 1
+        for row in rows:
+            lst.append(row[0])
         matlabel = tk.Label(form, text="Digite a matricula do aluno")
-        matentry = tk.Entry(form, textvariable=self.mat)
-        codlabel = tk.Label(form, text="Digite o código da matéria registrada")
-        codentry = tk.Entry(form, textvariable=self.cod)
+        matentry = ttk.Combobox(form, textvariable=self.mat)
+        matentry['values'] = lst
+        alunoselect = tk.Button(form, text="Buscar aluno" ,command=self.getNotas)
         sim1label = tk.Label(form, text="Sim1")
         sim1entry = tk.Entry(form, textvariable=self.sim1)
         sim2label = tk.Label(form, text="Sim2")
@@ -350,11 +379,9 @@ class notaProf(tk.Frame):
         aventry = tk.Entry(form, textvariable=self.av)
         avslabel = tk.Label(form, text="Avs")
         avsentry = tk.Entry(form, textvariable=self.avs)
-        submit = tk.Button(self, text="Pesquisar", command=print)
         matlabel.grid(row=0, column=0)
         matentry.grid(row=0, column=1)
-        codlabel.grid(row=1, column=0)
-        codentry.grid(row=1, column=1)
+        alunoselect.grid(row=0, column=2)
         sim1label.grid(row=2, column=0)
         sim1entry.grid(row=2, column=1)
         sim2label.grid(row=2, column=2)
@@ -363,13 +390,13 @@ class notaProf(tk.Frame):
         aventry.grid(row=3, column=1)
         avslabel.grid(row=3, column=2)
         avsentry.grid(row=3, column=3)
-        submit.pack()
         form.pack()
-        self.msgvar = tk.StringVar()
-        msgerro = tk.Label(self, textvariable=self.msgvar)
-        msgerro.pack()
-        self.tablecont.pack()
-
+    def getNotas(self):
+        mat = self.mat.get()
+        cod = self.cod.get()
+        tempobj = Inscricao(mat,cod)
+        rows = tempobj.selectNotas()
+        print(rows)
 
 class pageDisciplinas(tk.Frame):
     def __init__(self, parent, control):
