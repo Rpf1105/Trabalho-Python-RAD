@@ -1,4 +1,5 @@
 import tkinter as tk
+from Objetos import *
 from cProfile import label
 from tkinter import font, StringVar, Label
 from tkinter import ttk
@@ -6,7 +7,9 @@ from tkinter import ttk
 from cryptography.fernet import Fernet
 
 import db
-from db import connectDb, queryExec, Disciplina, Inscricao, returnSelect
+from Objetos.Disciplina import Disciplina
+from Objetos.Inscrição import Inscricao
+from db import connectDb, returnSelect
 
 
 class myApp(tk.Tk):
@@ -29,7 +32,7 @@ class myApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
         self.frames = {}
         #importa classes que definem as paginas em frames e sobrepõe eles
-        for f in (mainMenu, mainAluno, pageDisciplinas, pageInscricao, getMatricula, getLogin):
+        for f in (mainMenu, mainAluno, pageDisciplinas, pageInscricao, getMatricula, getLogin, mainProf):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -115,7 +118,10 @@ class mainAluno(tk.Frame):
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
+            self.showpage("inscricaoAluno")
     def showpage(self, pagename):
+        if pagename == "notaAluno":
+            self.frames["notaAluno"].fullTable()
         frame = self.frames[pagename]
         frame.tkraise()
 
@@ -158,7 +164,7 @@ class notaAluno(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
         self.control = control
-        self.tablecont = tk.Frame(self)
+        self.tablecont = tk.Frame(self, padx=20)
         label = tk.Label(self, text="Suas notas")
         label.pack()
         search = tk.Frame(self)
@@ -181,21 +187,23 @@ class notaAluno(tk.Frame):
         for child in self.tablecont.winfo_children():
             child.destroy()
         self.msgvar.set("")
+        matricula = self.control.control.matriculacookie.get()
+        print(matricula)
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
-        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), "")
+        tempobj = Inscricao(matricula, "")
         lst = tempobj.selectAllAluno(connectDb())
         Table(self.tablecont, titles, lst)
 
     def searchTable(self):
-        if self.cod.get() == "":
-            self.msgvar.set("Não foi digitado nenhum valor")
-            return 
-        else:
-            self.msgvar.set("")
         for child in self.tablecont.winfo_children():
             child.destroy()
+        if self.cod.get() == "":
+            self.msgvar.set("Não foi digitado nenhum valor")
+            return
+        else:
+            self.msgvar.set("")
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
-        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
+        tempobj = Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
         lst = tempobj.select(connectDb())
         if not lst:
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
@@ -297,7 +305,7 @@ class notaProf(tk.Frame):
             child.destroy()
         self.msgvar.set("")
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
-        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), "")
+        tempobj = Inscricao(self.control.control.matriculacookie.get(), "")
         lst = tempobj.selectAllAluno(connectDb())
         Table(self.tablecont, titles, lst)
 
@@ -310,7 +318,7 @@ class notaProf(tk.Frame):
         for child in self.tablecont.winfo_children():
             child.destroy()
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
-        tempobj = db.Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
+        tempobj = Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
         lst = tempobj.select(connectDb())
         if not lst:
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
