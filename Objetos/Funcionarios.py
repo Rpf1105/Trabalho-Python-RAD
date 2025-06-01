@@ -8,7 +8,7 @@ class Funcionario:
         self.senha = senha
         self.admin = False
     def insert(self):
-        query = '''INSERT INTO public.funcionários VALUES(%(nome)s, %(email)s, %(senha)s, %(admin)s);'''
+        query = '''INSERT INTO public.funcionários VALUES(%(email)s, %(nome)s, %(senha)s, %(admin)s);'''
     def update(self):
         query = '''UPDATE public.funcionários SET nome = :nome WHERE Código = :%(codigo)s'''
     def delete(self):

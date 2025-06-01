@@ -6,7 +6,6 @@ from tkinter import ttk
 
 from cryptography.fernet import Fernet
 
-import db
 from Objetos.Disciplina import Disciplina
 from Objetos.Inscrição import Inscricao
 from db import connectDb, returnSelect
@@ -158,7 +157,7 @@ class inscricaoAluno(tk.Frame):
             #as camadas estão indo fundo demais, pra chegar no cookie da raiz precisa disso
             self.msgvar.set("")
             newinscricao = Inscricao(self.control.control.matriculacookie.get(), cod)
-            newinscricao.insert(connectDb())
+            newinscricao.insert()
 
 class notaAluno(tk.Frame):
     def __init__(self, parent, control):
@@ -191,7 +190,7 @@ class notaAluno(tk.Frame):
         print(matricula)
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
         tempobj = Inscricao(matricula, "")
-        lst = tempobj.selectAllAluno(connectDb())
+        lst = tempobj.selectAllAluno()
         Table(self.tablecont, titles, lst)
 
     def searchTable(self):
@@ -204,7 +203,7 @@ class notaAluno(tk.Frame):
             self.msgvar.set("")
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
         tempobj = Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
-        lst = tempobj.select(connectDb())
+        lst = tempobj.select()
         if not lst:
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
             return
@@ -255,7 +254,7 @@ class mainProf(tk.Frame):
         #operações
         options = tk.Frame(self)
         novainscricao = tk.Button(options, text="Ver os dados dos seus alunos",
-                           command=lambda: self.showpage("profDados"),padx=5)
+                           command=lambda: self.showpage("selectProf"),padx=5)
         novainscricao.pack(side="left")
         vernotas = tk.Button(options, text="Inserir as notas",
                            command=lambda: self.showpage("notaProf"), padx=5)
@@ -269,7 +268,7 @@ class mainProf(tk.Frame):
                            command=lambda: control.showpage("mainMenu"))
         button.pack(side="top")
         self.frames={}
-        for f in (notaProf,):
+        for f in (selectProf, notaProf):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -278,7 +277,7 @@ class mainProf(tk.Frame):
         frame = self.frames[pagename]
         frame.tkraise()
 
-class notaProf(tk.Frame):
+class selectProf(tk.Frame):
     def __init__(self, parent, control):
         tk.Frame.__init__(self, parent)
         self.control = control
@@ -306,7 +305,7 @@ class notaProf(tk.Frame):
         self.msgvar.set("")
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
         tempobj = Inscricao(self.control.control.matriculacookie.get(), "")
-        lst = tempobj.selectAllAluno(connectDb())
+        lst = tempobj.selectAllAluno()
         Table(self.tablecont, titles, lst)
 
     def searchTable(self):
@@ -319,11 +318,58 @@ class notaProf(tk.Frame):
             child.destroy()
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF"]
         tempobj = Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
-        lst = tempobj.select(connectDb())
+        lst = tempobj.select()
         if not lst:
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
             return
         Table(self.tablecont, titles, lst)
+
+class notaProf(tk.Frame):
+    def __init__(self, parent, control):
+        tk.Frame.__init__(self, parent)
+        self.control = control
+        self.tablecont = tk.Frame(self)
+        label = tk.Label(self, text="Inserir notas dos alunos")
+        label.pack()
+        form = tk.Frame(self)
+        self.mat = tk.StringVar()
+        self.cod = tk.StringVar()
+        self.sim1 = tk.StringVar()
+        self.sim2 = tk.StringVar()
+        self.av = tk.StringVar()
+        self.avs = tk.StringVar()
+        matlabel = tk.Label(form, text="Digite a matricula do aluno")
+        matentry = tk.Entry(form, textvariable=self.mat)
+        codlabel = tk.Label(form, text="Digite o código da matéria registrada")
+        codentry = tk.Entry(form, textvariable=self.cod)
+        sim1label = tk.Label(form, text="Sim1")
+        sim1entry = tk.Entry(form, textvariable=self.sim1)
+        sim2label = tk.Label(form, text="Sim2")
+        sim2entry = tk.Entry(form, textvariable=self.sim2)
+        avlabel = tk.Label(form, text="Av")
+        aventry = tk.Entry(form, textvariable=self.av)
+        avslabel = tk.Label(form, text="Avs")
+        avsentry = tk.Entry(form, textvariable=self.avs)
+        submit = tk.Button(self, text="Pesquisar", command=print)
+        matlabel.grid(row=0, column=0)
+        matentry.grid(row=0, column=1)
+        codlabel.grid(row=1, column=0)
+        codentry.grid(row=1, column=1)
+        sim1label.grid(row=2, column=0)
+        sim1entry.grid(row=2, column=1)
+        sim2label.grid(row=2, column=2)
+        sim2entry.grid(row=2, column=3)
+        avlabel.grid(row=3, column=0)
+        aventry.grid(row=3, column=1)
+        avslabel.grid(row=3, column=2)
+        avsentry.grid(row=3, column=3)
+        submit.pack()
+        form.pack()
+        self.msgvar = tk.StringVar()
+        msgerro = tk.Label(self, textvariable=self.msgvar)
+        msgerro.pack()
+        self.tablecont.pack()
+
 
 class pageDisciplinas(tk.Frame):
     def __init__(self, parent, control):
