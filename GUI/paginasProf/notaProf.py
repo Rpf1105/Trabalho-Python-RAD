@@ -124,8 +124,8 @@ class notaProf(ttk.Frame):
             nf=10
         tempobj = Inscricao(aluno=self.mat.get(), disciplina=self.cod.get(), sim1=sim1, sim2=sim2, av=av, avs=avs, nf=nf)
         tempobj.update()
-    def setup(self):
-        email = self.control.control.logincookie
+    def setup(self, cookie):
+        email = cookie
         tempobj = Professor(email)
         rows=tempobj.selectAllDisciplinas()
         self.lst = []

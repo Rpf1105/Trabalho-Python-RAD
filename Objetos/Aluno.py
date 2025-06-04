@@ -19,13 +19,13 @@ class Aluno:
         query = '''UPDATE Aluno SET nome = %(nome)s WHERE matricula = %(matricula)s'''
         return queryExec(query, self)
     def delete(self):
-        query = '''DELETE FROM Aluno WHERE matricula = %(matricula)s'''
+        query = '''DELETE FROM public.Aluno WHERE matricula = %(matricula)s'''
         return queryExec(query, self)
     def select(self):
-        query = '''SELECT * FROM Aluno WHERE matricula = %(matricula)s'''
+        query = '''SELECT * FROM public.Aluno WHERE matricula = %(matricula)s'''
         return returnSelect(query, self)
     def selectNome(self):
-        query = '''SELECT nome FROM Aluno WHERE matricula = %(matricula)s'''
+        query = '''SELECT nome FROM public.Aluno WHERE matricula = %(matricula)s'''
         return returnSelect(query, self)
     def gerarMatricula(self):
         date = datetime.today()

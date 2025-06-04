@@ -2,11 +2,11 @@ from db import queryExec, connectDb, returnSelect
 
 
 class Funcionario:
-    def __init__(self, email, senha, nome = ""):
+    def __init__(self, email, senha, nome = "", admin=False):
         self.nome = nome
         self.email = email
         self.senha = senha
-        self.admin = False
+        self.admin = admin
     def insert(self):
         query = '''INSERT INTO public.funcionários VALUES(%(email)s, %(nome)s, %(senha)s, %(admin)s);'''
         return queryExec(query, self)
@@ -21,4 +21,7 @@ class Funcionario:
         return returnSelect(query, self)
     def checkLogin(self):
         query = '''SELECT 1 FROM public.funcionários WHERE email = %(email)s AND senha = %(senha)s'''
+        return returnSelect(query, self)
+    def checkAdmin(self):
+        query = '''SELECT admin FROM public.funcionários WHERE email = %(email)s AND senha = %(senha)s'''
         return returnSelect(query, self)

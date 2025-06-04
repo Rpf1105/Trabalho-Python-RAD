@@ -30,10 +30,8 @@ class notaAluno(ttk.Frame):
         for child in self.tablecont.winfo_children():
             child.destroy()
         self.msgvar.set("")
-        matricula = self.control.control.matriculacookie.get()
-        print(matricula)
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF", "Aprovação"]
-        tempobj = Inscricao(matricula, "")
+        tempobj = Inscricao(self.mat, "")
         lst = tempobj.selectAllAluno()
         Table(self.tablecont, titles, lst, aprovacao=True)
 
@@ -46,9 +44,12 @@ class notaAluno(ttk.Frame):
         else:
             self.msgvar.set("")
         titles = ["Matricula", "Código", "Sim 1", "Sim 2", "Av", "Avs", "NF", "Aprovação"]
-        tempobj = Inscricao(self.control.control.matriculacookie.get(), self.cod.get())
+        tempobj = Inscricao(self.mat, self.cod.get())
         lst = tempobj.selectAluno()
         if not lst:
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
             return
         Table(self.tablecont, titles, lst, aprovacao=True)
+    def setup(self, cookie):
+        self.mat = cookie
+        self.fullTable()

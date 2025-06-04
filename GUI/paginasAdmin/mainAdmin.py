@@ -1,10 +1,9 @@
 from tkinter import ttk
 from GUI.CustomWidgets import myLabel, myButton
-from GUI.paginasAluno.inscriçãoAluno import inscricaoAluno
-from GUI.paginasAluno.notaAluno import notaAluno
+from GUI.paginasAdmin.adminAluno import adminAluno
 
 
-class mainAluno(ttk.Frame):
+class mainAdmin(ttk.Frame):
     def __init__(self, parent, control):
         ttk.Frame.__init__(self, parent)
         self.control = control
@@ -12,12 +11,12 @@ class mainAluno(ttk.Frame):
         label.pack(side="top", fill="x")
         #operações
         options = ttk.Frame(self)
-        novainscricao = myButton(options, text="Fazer inscrição",
-                           command=lambda: self.showpage("inscricaoAluno"))
-        novainscricao.pack(side="left", padx=10, pady=10)
-        vernotas = myButton(options, text="Ver suas notas",
-                           command=lambda: self.showpage("notaAluno"))
-        vernotas.pack(side="left", padx=10, pady=10)
+        alunos = myButton(options, text="Alunos",
+                           command=lambda: self.showpage("adminAluno"))
+        alunos.pack(side="left", padx=5)
+        vernotas = myButton(options, text="Disciplinas",
+                           command=lambda: self.showpage("adminDisciplina"))
+        vernotas.pack(side="left", padx=5)
         options.pack()
         container = ttk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -27,15 +26,11 @@ class mainAluno(ttk.Frame):
                            command=lambda: control.showpage("mainMenu"))
         button.pack(side="top")
         self.frames={}
-        for f in (inscricaoAluno,notaAluno):
+        for f in (adminAluno, ):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
-            self.showpage("inscricaoAluno")
     def showpage(self, pagename):
         frame = self.frames[pagename]
         frame.tkraise()
-    def setup(self, cookie):
-        self.frames["notaAluno"].setup(cookie)
-        self.frames["inscricaoAluno"].setup(cookie)

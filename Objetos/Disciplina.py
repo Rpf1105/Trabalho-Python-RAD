@@ -1,6 +1,4 @@
-from db import connectDb, returnSelect, queryExec
-
-
+from db import returnSelect, queryExec
 class Disciplina:
     def __init__(self, nome, codigo, ano, semestre):
         self.nome = nome

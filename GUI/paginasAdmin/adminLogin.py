@@ -4,7 +4,7 @@ from GUI.CustomWidgets import myLabel, myButton, myEntry
 from Objetos.Funcionarios import Funcionario
 
 
-class getLogin(ttk.Frame):
+class adminLogin(ttk.Frame):
     def __init__(self, parent, control):
         ttk.Frame.__init__(self, parent)
         self.control = control
@@ -31,9 +31,12 @@ class getLogin(ttk.Frame):
         rows = tempobj.checkLogin()
         print(rows)
         if not rows :
-            self.msgvar.set("O usuario e/ou senha estão incorretos")
+            self.msgvar.set("O usuário e/ou senha estão incorretos")
         else:
-            #variavel da janela pai para salvar a o email do professor para verificar suas disciplinas
-            self.control.logincookie = user
-            self.msgvar.set("")
-            self.control.showpage("mainProf")
+            rows = tempobj.checkAdmin()
+            if rows[0][0] is True:
+                self.control.logincookie = user
+                self.msgvar.set("")
+                self.control.showpage("mainAdmin")
+            else:
+                self.msgvar.set("Você não tem permissão de acesso")

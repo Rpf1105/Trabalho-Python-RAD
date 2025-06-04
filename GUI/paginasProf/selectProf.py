@@ -88,8 +88,8 @@ class selectProf(ttk.Frame):
             self.msgvar.set("Nenhuma inscrição foi encontrada, verifique se o código foi digitado corretamente")
             return
         Table(self.tablecont, titles, lst, aprovacao=True)
-    def setup(self):
-        email = self.control.control.logincookie
+    def setup(self, cookie):
+        email = cookie
         tempobj = Professor(email)
         rows=tempobj.selectAllDisciplinas()
         self.lst = []

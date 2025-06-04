@@ -10,6 +10,7 @@ class inscricaoAluno(ttk.Frame):
     def __init__(self, parent, control):
         ttk.Frame.__init__(self, parent)
         self.control = control
+        #pede o código da matéria para inscrição (mudar depois para combobox se der tempo e eu lembrar)
         form = ttk.Frame(self)
         matlabel = myLabel(form, text="Digite o código do curso")
         self.codigo = tk.StringVar()
@@ -28,15 +29,15 @@ class inscricaoAluno(ttk.Frame):
         mensagem.pack()
         tablecont.pack()
     def checkDisciplina(self):
-        con = connectDb()
-        cursor = con.cursor()
         cod = self.codigo.get()
-        cursor.execute('''SELECT * FROM public.Disciplina WHERE Código = %s;''', (cod,))
-        rows = cursor.fetchone()
+        tempobj = Disciplina("", cod,0,0)
+        rows = tempobj.selectNome()
         if rows is None:
             self.msgvar.set("Essa disciplina não existe")
         else:
-            #as camadas estão indo fundo demais, pra chegar no cookie da raiz precisa disso
-            newinscricao = Inscricao(self.control.control.matriculacookie.get(), cod)
+            #as camadas estão indo fundo demais, pra chegar no cookie da raiz precisa disso, mudar para metodo setup igual o prof
+            newinscricao = Inscricao(self.mat, cod)
             newinscricao.insert()
             self.msgvar.set("Inscrição realizada com sucesso")
+    def setup(self, cookie):
+        self.mat = cookie

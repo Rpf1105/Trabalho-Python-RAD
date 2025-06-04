@@ -35,6 +35,6 @@ class mainProf(ttk.Frame):
     def showpage(self, pagename):
         frame = self.frames[pagename]
         frame.tkraise()
-    def setup(self):
-        self.frames["selectProf"].setup()
-        self.frames["notaProf"].setup()
+    def setup(self, cookie):
+        self.frames["selectProf"].setup(cookie)
+        self.frames["notaProf"].setup(cookie)

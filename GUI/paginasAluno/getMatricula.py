@@ -1,10 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
 from GUI.CustomWidgets import myLabel, myButton, myEntry
+from Objetos.Aluno import Aluno
 from db import connectDb
 
 class getMatricula(ttk.Frame):
     def __init__(self, parent, control):
+        #Pagina de login para os alunos
         ttk.Frame.__init__(self, parent)
         self.control = control
         myLabel(self, text="Digite a sua matricula").pack()
@@ -18,15 +20,13 @@ class getMatricula(ttk.Frame):
         mensagem = myLabel(self, textvariable=self.msgvar)
         mensagem.pack()
     def checkMatricula(self):
-        con = connectDb()
-        cursor = con.cursor()
         mat = self.matricula.get()
-        cursor.execute('''SELECT * FROM public.Aluno WHERE Matricula = %s;''', (mat,))
-        rows = cursor.fetchone()
+        tempobj = Aluno("",mat)
+        rows = tempobj.selectNome()
         if rows is None:
             self.msgvar.set("Essa matricula não existe")
         else:
             #variavel da janela pai para salvar a matricula do aluno
-            self.control.matriculacookie.set(mat)
+            self.control.matriculacookie = mat
             self.msgvar.set("")
             self.control.showpage("mainAluno")
