@@ -6,7 +6,7 @@ from db import queryExec, connectDb, returnSelect
 
 
 class Aluno:
-    def __init__(self, nome, matricula=None):
+    def __init__(self, nome=None, matricula=None):
         self.nome = nome
         if matricula is None:
             self.matricula = self.gerarMatricula()
@@ -14,16 +14,19 @@ class Aluno:
             self.matricula = matricula
     def insert(self):
         query = '''INSERT INTO public.Aluno VALUES(%(nome)s, %(matricula)s)'''
-        return queryExec(connectDb(), query, self)
+        return queryExec(query, self)
     def update(self):
-        query = '''UPDATE Aluno SET nome = :nome WHERE matricula = :matricula'''
-        return queryExec(connectDb(), query, self)
+        query = '''UPDATE Aluno SET nome = %(nome)s WHERE matricula = %(matricula)s'''
+        return queryExec(query, self)
     def delete(self):
-        query = '''DELETE FROM Aluno WHERE matricula = :matricula'''
-        return queryExec(connectDb(), query, self)
+        query = '''DELETE FROM Aluno WHERE matricula = %(matricula)s'''
+        return queryExec(query, self)
     def select(self):
-        query = '''SELECT * FROM Aluno WHERE matricula = :matricula'''
-        return returnSelect(connectDb(), query, self)
+        query = '''SELECT * FROM Aluno WHERE matricula = %(matricula)s'''
+        return returnSelect(query, self)
+    def selectNome(self):
+        query = '''SELECT nome FROM Aluno WHERE matricula = %(matricula)s'''
+        return returnSelect(query, self)
     def gerarMatricula(self):
         date = datetime.today()
         matricula = date.strftime('%Y%m')

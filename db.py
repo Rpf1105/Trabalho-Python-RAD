@@ -18,11 +18,10 @@ def connectDb():
     except conector.DatabaseError as err:
         print("Erro de banco de dados", err)
         connectDb()
-def closeDb(con):
-    con.close()
 
 
-def queryExec(con, query, obj):
+def queryExec(query, obj):
+    con = connectDb()
     cursor = con.cursor()
     try:
         cursor.execute(query, vars(obj))
@@ -39,7 +38,8 @@ def queryExec(con, query, obj):
         cursor.close()
         con.close()
 
-def returnSelect(con, query, obj=None):
+def returnSelect(query, obj=None):
+    con = connectDb()
     cursor = con.cursor()
     try:
         cursor.execute(query)
@@ -55,5 +55,15 @@ def returnSelect(con, query, obj=None):
     cursor.close()
     con.close()
     return rows
+def verifySimNota(nota):
+    if 0 <= nota <= 1:
+        return True
+def verifyAvNota(nota):
+    if 0 <= nota <= 10:
+        return True
+def checkAprovado():
+    return
+
 
 connectDb()
+print(verifySimNota(0))
