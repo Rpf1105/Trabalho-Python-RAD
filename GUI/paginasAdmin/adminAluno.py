@@ -1,7 +1,7 @@
 from tkinter import ttk
 import tkinter as tk
 
-from GUI.CustomWidgets import myLabel, myEntry, myButton
+from GUI.CustomWidgets import myLabel, myEntry, myButton, Table, scrollFrame
 from Objetos.Aluno import Aluno
 
 
@@ -19,14 +19,31 @@ class adminAluno(ttk.Frame):
         myEntry(form, textvariable=self.mat).grid(row=1, column=1)
         ins = myButton(self, text="Inserir Aluno", command=self.insert)
         dele = myButton(self, text="Remover Aluno", command=self.delete)
+        self.msgvar = tk.StringVar()
+        msgerro = myLabel(self, textvariable=self.msgvar)
         form.pack()
         ins.pack(pady=10)
         dele.pack(pady=10)
+        msgerro.pack()
+        tabletitle = myLabel(self, "Lista de todos os alunos encontrados")
+        tabletitle.pack(pady=10)
+        self.tablecont = ttk.Frame(self)
+        self.tablecont.pack()
+
     def insert(self):
         tempobj = Aluno(self.nome.get())
-        tempobj.insert()
+        op = tempobj.insert()
+        self.msgvar.set(op)
+        self.setup()
     def delete(self):
         tempobj = Aluno("",self.mat.get())
-        tempobj.delete()
-
-
+        op = tempobj.delete()
+        self.msgvar.set(op)
+        self.setup()
+    def setup(self):
+        for child in self.tablecont.winfo_children():
+            child.destroy()
+        titles = ["Nome", "Matricula"]
+        tempobj = Aluno("","")
+        lst = tempobj.selectAll()
+        Table(self.tablecont, titles, lst)

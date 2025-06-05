@@ -52,6 +52,8 @@ class myApp(tb.Window):
             self.frames["mainProf"].setup(self.logincookie)
         if pagename == "mainAluno":
             self.frames["mainAluno"].setup(self.matriculacookie)
+        if pagename == "mainAdmin":
+            self.frames["mainAdmin"].setup()
         frame.tkraise()
 
 class mainMenu(ttk.Frame):

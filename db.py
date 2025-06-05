@@ -21,6 +21,7 @@ def connectDb():
 
 
 def queryExec(query, obj):
+    msg = "Operação realizada com sucesso"
     con = connectDb()
     cursor = con.cursor()
     try:
@@ -30,13 +31,16 @@ def queryExec(query, obj):
         cursor.execute(query, obj)
         con.commit()
     except conector.errors.UniqueViolation:
-        print("Chave primaria ja existe")
+        msg = "Chave primaria ja existe"
     except conector.errors.ForeignKeyViolation:
-        print("Chave estrangeira não encontrada")
-
+        msg = "Violação de chave estrangeira, ou referencia não existe ou foi tentado apagar uma linha que possui dependencias"
+        print("fk violation")
     finally:
         cursor.close()
         con.close()
+        return msg
+
+
 
 def returnSelect(query, obj=None):
     con = connectDb()

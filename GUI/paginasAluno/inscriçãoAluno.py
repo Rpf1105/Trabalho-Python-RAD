@@ -20,14 +20,12 @@ class inscricaoAluno(ttk.Frame):
         matlabel.grid(row=0, column=0)
         cod.grid(row=0, column=1)
         #tabela para mostrar disciplinas existentes
-        titles = ["Nome", "Código", "Ano", "Semestre"]
-        tablecont = ttk.Frame(self)
-        Table(tablecont, titles, Disciplina.selectAll())
+        self.tablecont = ttk.Frame(self)
         submit.pack(pady=10)
         self.msgvar = tk.StringVar(value="")
         mensagem = myLabel(self, textvariable=self.msgvar)
         mensagem.pack()
-        tablecont.pack()
+        self.tablecont.pack()
     def checkDisciplina(self):
         cod = self.codigo.get()
         tempobj = Disciplina("", cod,0,0)
@@ -41,3 +39,9 @@ class inscricaoAluno(ttk.Frame):
             self.msgvar.set("Inscrição realizada com sucesso")
     def setup(self, cookie):
         self.mat = cookie
+        # tabela para mostrar disciplinas existentes
+        for child in self.tablecont.winfo_children():
+            child.destroy()
+        titles = ["Nome", "Código", "Ano", "Semestre"]
+        lst = Disciplina.selectAll()
+        Table(self.tablecont, titles, lst)

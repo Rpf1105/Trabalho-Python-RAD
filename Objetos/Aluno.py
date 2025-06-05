@@ -27,6 +27,9 @@ class Aluno:
     def selectNome(self):
         query = '''SELECT nome FROM public.Aluno WHERE matricula = %(matricula)s'''
         return returnSelect(query, self)
+    def selectAll(self):
+        query ='''SELECT * FROM public.aluno'''
+        return returnSelect(query, self)
     def gerarMatricula(self):
         date = datetime.today()
         matricula = date.strftime('%Y%m')

@@ -13,6 +13,7 @@ class Professor:
         query = '''UPDATE public.Docentes SET nome = :nome WHERE Código = :%(codigo)s'''
     def delete(self):
         query = '''DELETE FROM public.Docentes WHERE Código = :%(codigo)s'''
+        queryExec(query, self)
     def selectProf(self):
         query = '''SELECT email FROM public.Docentes WHERE disciplina = %(codigo)s'''
     def selectAll(self):

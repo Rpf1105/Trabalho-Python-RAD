@@ -1,6 +1,10 @@
 from tkinter import ttk
 from GUI.CustomWidgets import myLabel, myButton
 from GUI.paginasAdmin.adminAluno import adminAluno
+from GUI.paginasAdmin.adminDisciplina import adminDisciplina
+from GUI.paginasAdmin.adminDocente import adminDocente
+from GUI.paginasAdmin.adminFuncionario import adminFuncionario
+from GUI.paginasAdmin.adminInscrição import adminInscricao
 
 
 class mainAdmin(ttk.Frame):
@@ -14,9 +18,18 @@ class mainAdmin(ttk.Frame):
         alunos = myButton(options, text="Alunos",
                            command=lambda: self.showpage("adminAluno"))
         alunos.pack(side="left", padx=5)
-        vernotas = myButton(options, text="Disciplinas",
+        disciplinas = myButton(options, text="Disciplinas",
                            command=lambda: self.showpage("adminDisciplina"))
-        vernotas.pack(side="left", padx=5)
+        disciplinas.pack(side="left", padx=5)
+        inscricao = myButton(options, text="Inscrições",
+                           command=lambda: self.showpage("adminInscricao"))
+        inscricao.pack(side="left", padx=5)
+        funcionario = myButton(options, text="Funcionários",
+                               command=lambda: self.showpage("adminFuncionario"))
+        funcionario.pack(side="left", padx=5)
+        docente = myButton(options, text="Professores",
+                             command=lambda: self.showpage("adminDocente"))
+        docente.pack(side="left", padx=5)
         options.pack()
         container = ttk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
@@ -26,7 +39,7 @@ class mainAdmin(ttk.Frame):
                            command=lambda: control.showpage("mainMenu"))
         button.pack(side="top")
         self.frames={}
-        for f in (adminAluno, ):
+        for f in (adminAluno, adminDisciplina, adminInscricao, adminFuncionario, adminDocente):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -34,3 +47,6 @@ class mainAdmin(ttk.Frame):
     def showpage(self, pagename):
         frame = self.frames[pagename]
         frame.tkraise()
+    def setup(self):
+        for f in self.frames.values():
+            f.setup()

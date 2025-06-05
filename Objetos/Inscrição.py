@@ -17,8 +17,11 @@ class Inscricao:
         query = '''UPDATE Inscrição SET sim1 = %(sim1)s, sim2=%(sim2)s, av=%(av)s, avs=%(avs)s, nf=%(nf)s WHERE disciplina = %(disciplina)s AND aluno = %(aluno)s'''
         return queryExec(query, self)
     def delete(self):
-        query = '''DELETE FROM Inscrição WHERE disciplina = :%(disciplina)s AND aluno = %(aluno)s'''
+        query = '''DELETE FROM public.Inscrição WHERE disciplina = %(disciplina)s AND aluno = %(aluno)s'''
         return queryExec(query, self)
+    def selectAll(self):
+        query = '''SELECT * FROM public.Inscrição'''
+        return returnSelect(query, self)
     def selectAluno(self):
         query = '''SELECT * FROM public.Inscrição WHERE Disciplina = %(disciplina)s AND Aluno = %(aluno)s'''
         return returnSelect(query, self)
