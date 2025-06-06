@@ -10,8 +10,9 @@ class Funcionario:
     def insert(self):
         query = '''INSERT INTO public.funcionários VALUES(%(email)s, %(nome)s, %(senha)s, %(admin)s);'''
         return queryExec(query, self)
-    def update(self):
-        query = '''UPDATE public.funcionários SET nome = %(nome)s WHERE email = %(email)s'''
+    def updatePass(self):
+        query = '''UPDATE public.funcionários SET senha = %(senha)s WHERE email = %(email)s'''
+        return queryExec(query, self)
     def delete(self):
         query = '''DELETE FROM public.funcionários WHERE email = %(email)s'''
         return queryExec(query, self)
@@ -29,3 +30,4 @@ class Funcionario:
     def checkAdmin(self):
         query = '''SELECT admin FROM public.funcionários WHERE email = %(email)s'''
         return returnSelect(query, self)
+

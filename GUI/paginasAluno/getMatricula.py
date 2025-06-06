@@ -26,7 +26,7 @@ class getMatricula(ttk.Frame):
         if rows is None:
             self.msgvar.set("Essa matricula não existe")
         else:
-            #variavel da janela pai para salvar a matricula do aluno
+            #variavel da janela pai para salvar a matricula do aluno para uso de busca
             self.control.matriculacookie = mat
             self.msgvar.set("")
             self.control.showpage("mainAluno")

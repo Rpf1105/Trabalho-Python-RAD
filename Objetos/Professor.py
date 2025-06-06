@@ -8,14 +8,16 @@ class Professor:
         self.codigo = codigo
     def insert(self):
         query = '''INSERT INTO public.Docentes VALUES(%(email)s, %(codigo)s);'''
-        queryExec(query, self)
+        return queryExec(query, self)
     def update(self):
-        query = '''UPDATE public.Docentes SET nome = :nome WHERE Código = :%(codigo)s'''
+        query = '''UPDATE public.Docentes SET email = %(email)s WHERE disciplina = %(codigo)s'''
+        return queryExec(query, self)
     def delete(self):
-        query = '''DELETE FROM public.Docentes WHERE Código = :%(codigo)s'''
-        queryExec(query, self)
+        query = '''DELETE FROM public.Docentes WHERE disciplina = %(codigo)s'''
+        return queryExec(query, self)
     def selectProf(self):
         query = '''SELECT email FROM public.Docentes WHERE disciplina = %(codigo)s'''
+        return  returnSelect(query, self)
     def selectAll(self):
         query = '''SELECT * FROM public.Docentes'''
         return db.returnSelect(query, self)

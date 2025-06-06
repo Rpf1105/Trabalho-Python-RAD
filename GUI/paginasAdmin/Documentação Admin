@@ -1,0 +1,5 @@
+Cada pagina possui campos para preencher do objeto associado,
+e nem todas operações necessitam todos os valores, essa relação é
+descrita na própria pagina, admins ser alterados por aqui por segurança
+e devem ser alterados no proprio postgresql, também não possui acesso a senha dos
+funcionarios embora possa os remover

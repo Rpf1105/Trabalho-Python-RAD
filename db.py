@@ -5,6 +5,7 @@ import psycopg2 as conector
 from cryptography.fernet import Fernet
 
 
+#Alterar para outros bancos de dados
 def connectDb():
     try:
         con = conector.connect(
@@ -20,6 +21,7 @@ def connectDb():
         connectDb()
 
 
+#tenta executar a query, e retorna uma mensagem baseada no erro (ou ausencia)
 def queryExec(query, obj):
     msg = "Operação realizada com sucesso"
     con = connectDb()
@@ -41,7 +43,7 @@ def queryExec(query, obj):
         return msg
 
 
-
+#Funcao geral para queries de SELECT, objeto é opcional
 def returnSelect(query, obj=None):
     con = connectDb()
     cursor = con.cursor()
@@ -59,14 +61,14 @@ def returnSelect(query, obj=None):
     cursor.close()
     con.close()
     return rows
+
 def verifySimNota(nota):
     if 0 <= nota <= 1:
         return True
 def verifyAvNota(nota):
     if 0 <= nota <= 10:
         return True
-def checkAprovado():
-    return
+
 
 
 connectDb()

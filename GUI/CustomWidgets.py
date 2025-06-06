@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 
+#Widgets estilizados para serem usados e padronizarem o visual da interface
 class myEntry(tk.Entry):
     def __init__(self, parent, textvariable=None, state="normal", width=30):
         font = tk.font.Font(family="Arial", size=15)
@@ -21,6 +22,8 @@ class myButton(tk.Button):
         font = tk.font.Font(family="Arial", size=15)
         tk.Button.__init__(self, master=parent, command=command, font=font, text=text, pady=10, padx=10)
 
+#Classe que gera as tabelas, aprovação é um parametro usado apenas para quando se forem exibir as notas, pois aprovação não é
+#uma coluna presente no banco de dados do postgresql
 class Table:
     def __init__(self, parent, titles, list, aprovacao=False):
         self.container = scrollFrame(parent)
@@ -59,6 +62,8 @@ class Table:
                 self.e.configure(state="disabled")
             self.container.pack()
 
+#Frame que possui barra de rolagem, o proposito original foi pois as tabelas quando tinham muitas linhas
+#comecavam a sair da tela, assim isso mantem elas em uma area que pode ser mexida
 class scrollFrame(ttk.Frame):
     def __init__(self, parent, *args, **kw):
         ttk.Frame.__init__(self, parent, *args, **kw)

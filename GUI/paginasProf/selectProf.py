@@ -89,6 +89,7 @@ class selectProf(ttk.Frame):
             return
         Table(self.tablecont, titles, lst, aprovacao=True)
     def setup(self, cookie):
+        #usa seu email para verificar quais são suas disciplinas consultando a tabela de docentes
         email = cookie
         tempobj = Professor(email)
         rows=tempobj.selectAllDisciplinas()

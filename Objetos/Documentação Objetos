@@ -1,0 +1,2 @@
+Os objetos representam as tabelas do banco de dados, para normalizar suas operações como
+metodos das classes, assim também organizando onde se alteram as operações de banco de dados

@@ -1,5 +1,6 @@
 from tkinter import ttk
 from GUI.CustomWidgets import myLabel, myButton
+from GUI.paginasProf.mudarSenha import mudarSenha
 from GUI.paginasProf.notaProf import notaProf
 from GUI.paginasProf.selectProf import selectProf
 
@@ -18,16 +19,19 @@ class mainProf(ttk.Frame):
         vernotas = myButton(options, text="Inserir as notas",
                            command=lambda: self.showpage("notaProf"))
         vernotas.pack(side="left", padx=5)
+        mudarsenha = myButton(options, text="Mudar sua senha",
+                           command=lambda: self.showpage("mudarSenha"))
+        mudarsenha.pack(side="left", padx=5)
         options.pack()
         container = ttk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
+        container.pack(side="top", fill="both", expand=True, pady=10)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
         button = myButton(self, text="Sair",
                            command=lambda: control.showpage("mainMenu"))
         button.pack(side="top")
         self.frames={}
-        for f in (selectProf, notaProf):
+        for f in (selectProf, notaProf, mudarSenha):
             page_name = f.__name__
             frame = f(control=self, parent=container)
             self.frames[page_name] = frame
@@ -38,3 +42,4 @@ class mainProf(ttk.Frame):
     def setup(self, cookie):
         self.frames["selectProf"].setup(cookie)
         self.frames["notaProf"].setup(cookie)
+        self.frames["mudarSenha"].setup(cookie)

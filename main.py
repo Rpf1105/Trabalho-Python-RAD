@@ -1,5 +1,6 @@
 from unittest.mock import sentinel
 
+import gui
 from Objetos.Aluno import Aluno
 from Objetos.Disciplina import *
 from Objetos.Funcionarios import Funcionario
@@ -8,6 +9,6 @@ from db import *
 
 
 def main():
-    print("Hello world")
+    gui.init()
 if __name__ =="__main__":
     main()
